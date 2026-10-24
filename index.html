@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPR 마스터 게임 - 응급처치 보건 수업</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome 아이콘 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter & Noto Sans KR -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            200: '#ddd6fe',
+                            300: '#c4b5fd',
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Noto Sans KR', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Card Flip Effect */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+        /* Dragging animations & styles */
+        .draggable-item {
+            touch-action: none;
+            user-select: none;
+        }
+        .dragging {
+            opacity: 0.5;
+            scale: 0.98;
+        }
+        .drop-zone-active {
+            border-color: #8b5cf6 !important;
+            background-color: #f5f3ff !important;
+        }
+        /* Glassmorphism custom */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-800 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white">
+
+    <!-- Header Section -->
+    <header class="bg-slate-900 border-b border-slate-800 text-white sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="goToStep(0)">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center shadow-lg shadow-brand-500/30">
+                    <i class="fa-solid fa-heart-pulse text-white text-xl animate-pulse"></i>
+                </div>
+                <div>
+                    <h1 class="font-black text-lg sm:text-xl tracking-tight bg-gradient-to-r from-white via-slate-200 to-brand-300 bg-clip-text text-transparent">CPR 마스터</h1>
+                    <p class="text-xs text-brand-300 font-medium hidden sm:block">청소년을 위한 생명구호 챌린지</p>
+                </div>
+            </div>
+
+            <!-- Progress Navigation Indicator -->
+            <div id="nav-steps" class="flex items-center space-x-1 sm:space-x-3 text-xs sm:text-sm font-semibold">
+                <div id="step-pill-1" class="px-3 py-1.5 rounded-full transition-all flex items-center space-x-1 bg-brand-600 text-white shadow-md shadow-brand-600/30">
+                    <span>1.</span><span class="hidden md:inline">단계 학습</span>
+                </div>
+                <i class="fa-solid fa-chevron-right text-slate-600 text-xs"></i>
+                <div id="step-pill-2" class="px-3 py-1.5 rounded-full transition-all flex items-center space-x-1 bg-slate-800 text-slate-400">
+                    <span>2.</span><span class="hidden md:inline">순서 퍼즐</span>
+                </div>
+                <i class="fa-solid fa-chevron-right text-slate-600 text-xs"></i>
+                <div id="step-pill-3" class="px-3 py-1.5 rounded-full transition-all flex items-center space-x-1 bg-slate-800 text-slate-400">
+                    <span>3.</span><span class="hidden md:inline">검증 퀴즈</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow flex items-center justify-center p-3 sm:p-6">
+        <div class="w-full max-w-4xl mx-auto">
+
+            <!-- ================= START SCREEN ================= -->
+            <section id="screen-start" class="block transition-all duration-300">
+                <div class="glass-card rounded-3xl p-6 sm:p-10 shadow-2xl border border-slate-700/50 text-center relative overflow-hidden">
+                    <div class="absolute -top-24 -right-24 w-60 h-60 bg-brand-500/20 rounded-full blur-3xl pointer-events-none"></div>
+                    <div class="absolute -bottom-24 -left-24 w-60 h-60 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+                    <span class="inline-block px-4 py-1.5 rounded-full bg-brand-100 text-brand-700 font-bold text-xs sm:text-sm mb-4 border border-brand-200">
+                        🚨 보건 수업 필수 코스
+                    </span>
+                    <h2 class="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
+                        4분의 기적, <span class="bg-gradient-to-r from-brand-600 to-indigo-600 bg-clip-text text-transparent">CPR 마스터</span>가 되자!
+                    </h2>
+                    <p class="text-slate-600 max-w-xl mx-auto text-sm sm:text-base mb-8 leading-relaxed">
+                        심정지 환자 발생 시 골든타임 4분! 정확한 심폐소생술 순서와 방법을 3단계(학습 ➔ 순서 맞추기 ➔ 실전 퀴즈) 게임으로 쉽고 확실하게 완정복해보세요.
+                    </p>
+
+                    <!-- Start Cards Preview -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 text-left">
+                        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-brand-300 transition">
+                            <div class="w-10 h-10 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center font-bold text-lg mb-3">1</div>
+                            <h3 class="font-bold text-slate-800 mb-1">CPR 8단계 학습</h3>
+                            <p class="text-xs text-slate-500">카드 뒤집기로 8가지 핵심 생명구호 단계를 직관적으로 익힙니다.</p>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-brand-300 transition">
+                            <div class="w-10 h-10 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center font-bold text-lg mb-3">2</div>
+                            <h3 class="font-bold text-slate-800 mb-1">순서 퍼즐 게임</h3>
+                            <p class="text-xs text-slate-500">무작위로 섞인 순서를 올바르게 드래그하여 완성합니다.</p>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-brand-300 transition">
+                            <div class="w-10 h-10 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center font-bold text-lg mb-3">3</div>
+                            <h3 class="font-bold text-slate-800 mb-1">실전 검증 퀴즈</h3>
+                            <p class="text-xs text-slate-500">실생활 상황 중심의 4지선다 퀴즈 8문항을 해결합니다.</p>
+                        </div>
+                    </div>
+
+                    <button onclick="goToStep(1)" class="w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-700 hover:to-indigo-700 text-white font-bold text-lg rounded-2xl shadow-xl shadow-brand-500/30 transform hover:-translate-y-0.5 active:translate-y-0 transition duration-200 flex items-center justify-center mx-auto space-x-2">
+                        <span>게임 시작하기</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- ================= STEP 1: CARD LEARNING ================= -->
+            <section id="screen-step1" class="hidden transition-all duration-300">
+                <div class="glass-card rounded-3xl p-5 sm:p-8 shadow-2xl border border-slate-700/50">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-2">
+                        <div>
+                            <span class="text-brand-600 font-extrabold text-xs tracking-wider uppercase">STEP 1. 개념 학습</span>
+                            <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">CPR 8대 단계 마스터 카드</h2>
+                        </div>
+                        <div class="flex items-center space-x-2 bg-slate-100 p-1 rounded-xl text-xs font-bold text-slate-600">
+                            <button id="view-mode-single" onclick="toggleStep1View('single')" class="px-3 py-1.5 rounded-lg bg-white shadow text-brand-600">카드 보기</button>
+                            <button id="view-mode-all" onclick="toggleStep1View('all')" class="px-3 py-1.5 rounded-lg hover:text-slate-900">전체 보기</button>
+                        </div>
+                    </div>
+
+                    <!-- Single Card View Carousel -->
+                    <div id="step1-single-view" class="block">
+                        <div class="relative max-w-md mx-auto my-6">
+                            <!-- Card Container -->
+                            <div id="flashcard" onclick="flipCard()" class="perspective-1000 cursor-pointer h-80 sm:h-96 w-full">
+                                <div id="flashcard-inner" class="relative w-full h-full duration-500 transform-style-3d shadow-xl rounded-3xl border border-brand-100 bg-gradient-to-br from-white to-brand-50/50">
+                                    <!-- Front Side -->
+                                    <div class="absolute inset-0 w-full h-full rounded-3xl backface-hidden p-6 flex flex-col justify-between items-center text-center">
+                                        <div class="w-full flex justify-between items-center">
+                                            <span id="card-badge" class="px-3 py-1 bg-brand-100 text-brand-700 font-bold text-xs rounded-full">1단계 / 8단계</span>
+                                            <span class="text-xs text-slate-400 flex items-center"><i class="fa-solid fa-rotate text-brand-500 mr-1"></i> 클릭하여 뒤집기</span>
+                                        </div>
+                                        <div class="my-auto">
+                                            <div id="card-emoji" class="text-6xl sm:text-7xl mb-4 transform hover:scale-110 transition duration-300">🗣️</div>
+                                            <h3 id="card-title" class="text-2xl sm:text-3xl font-black text-slate-900 mb-2">반응 확인</h3>
+                                            <p id="card-subtitle" class="text-brand-600 font-medium text-sm sm:text-base">어깨를 두드리며 "괜찮으세요?" 확인</p>
+                                        </div>
+                                        <div class="w-full text-center text-xs font-semibold text-slate-400 bg-slate-100/80 py-2 rounded-xl">
+                                            💡 뒷면에 세부 요령이 있습니다
+                                        </div>
+                                    </div>
+                                    <!-- Back Side -->
+                                    <div class="absolute inset-0 w-full h-full rounded-3xl backface-hidden rotate-y-180 bg-gradient-to-br from-brand-600 to-indigo-700 text-white p-6 flex flex-col justify-between items-center text-center">
+                                        <div class="w-full flex justify-between items-center">
+                                            <span class="px-3 py-1 bg-white/20 text-white font-bold text-xs rounded-full">세부 행동 요령</span>
+                                            <span class="text-xs text-brand-200"><i class="fa-solid fa-rotate mr-1"></i> 클릭하여 앞면</span>
+                                        </div>
+                                        <div class="my-auto text-left w-full">
+                                            <h4 id="card-back-title" class="text-xl font-bold mb-3 border-b border-white/20 pb-2 text-brand-200">핵심 포인트</h4>
+                                            <p id="card-desc" class="text-sm sm:text-base leading-relaxed text-slate-100">
+                                                환자의 양쪽 어깨를 가볍게 두드리며 큰 소리로 "괜찮으세요?"라고 물어의식 및 반응을 확인합니다.
+                                            </p>
+                                        </div>
+                                        <div id="card-tip" class="w-full text-left text-xs bg-black/20 p-3 rounded-xl border border-white/10 text-brand-100">
+                                            📌 주의: 환자를 과도하게 흔들면 척추 손상 등 2차 피해가 발생할 수 있습니다.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Carousel Controls -->
+                        <div class="flex items-center justify-between max-w-md mx-auto">
+                            <button onclick="prevCard()" class="p-3 bg-slate-100 hover:bg-brand-100 text-slate-700 hover:text-brand-700 rounded-2xl font-bold transition flex items-center space-x-1">
+                                <i class="fa-solid fa-arrow-left"></i>
+                                <span class="text-xs sm:text-sm">이전</span>
+                            </button>
+                            <div id="card-dots" class="flex space-x-1.5">
+                                <!-- Dots rendered dynamically -->
+                            </div>
+                            <button onclick="nextCard()" class="p-3 bg-slate-100 hover:bg-brand-100 text-slate-700 hover:text-brand-700 rounded-2xl font-bold transition flex items-center space-x-1">
+                                <span class="text-xs sm:text-sm">다음</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- All Cards Grid View -->
+                    <div id="step1-all-view" class="hidden grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 my-4">
+                        <!-- Cards dynamically rendered here -->
+                    </div>
+
+                    <!-- Next Step Button -->
+                    <div class="mt-8 pt-4 border-t border-slate-200 flex justify-end">
+                        <button onclick="goToStep(2)" class="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl shadow-lg shadow-brand-500/30 transition flex items-center space-x-2">
+                            <span>2단계 : 순서 맞추기 퍼즐 도전</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= STEP 2: PUZZLE GAME ================= -->
+            <section id="screen-step2" class="hidden transition-all duration-300">
+                <div class="glass-card rounded-3xl p-5 sm:p-8 shadow-2xl border border-slate-700/50">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
+                        <div>
+                            <span class="text-brand-600 font-extrabold text-xs tracking-wider uppercase">STEP 2. 순서 재배치 퍼즐</span>
+                            <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">올바른 CPR 순서를 완성하세요!</h2>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs text-slate-500 block">시도 횟수</span>
+                            <span id="puzzle-attempts" class="font-black text-brand-600 text-lg">0회</span>
+                        </div>
+                    </div>
+
+                    <p class="text-slate-600 text-xs sm:text-sm mb-6 bg-brand-50 p-3 rounded-xl border border-brand-100">
+                        💡 <strong>게임 방법:</strong> 카드 우측 핸들을 잡고 드래그하거나 터치하여 1단계부터 8단계까지 올바른 심폐소생술 순서대로 정렬한 후 [정답 확인하기]를 누르세요.
+                    </p>
+
+                    <!-- Draggable List Container -->
+                    <div id="puzzle-list" class="space-y-2.5 mb-6">
+                        <!-- Dynamic items -->
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-slate-200">
+                        <button onclick="shufflePuzzle()" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-shuffle"></i>
+                            <span>다시 섞기</span>
+                        </button>
+                        <button onclick="checkPuzzleAnswer()" class="flex-grow py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl shadow-lg shadow-brand-500/30 transition flex items-center justify-center space-x-2 text-base">
+                            <i class="fa-solid fa-check"></i>
+                            <span>정답 확인하기</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= STEP 3: QUIZ ================= -->
+            <section id="screen-step3" class="hidden transition-all duration-300">
+                <div class="glass-card rounded-3xl p-5 sm:p-8 shadow-2xl border border-slate-700/50">
+                    <!-- Progress Bar & Header -->
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-brand-600 font-extrabold text-xs tracking-wider uppercase">STEP 3. 보건 실전 퀴즈</span>
+                            <span id="quiz-progress-text" class="text-xs font-bold text-slate-500">문제 1 / 8</span>
+                        </div>
+                        <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                            <div id="quiz-progress-bar" class="h-full bg-gradient-to-r from-brand-500 to-indigo-600 w-1/8 transition-all duration-300"></div>
+                        </div>
+                    </div>
+
+                    <!-- Question Container -->
+                    <div class="mb-6">
+                        <span id="quiz-category" class="inline-block text-xs font-bold px-2.5 py-1 bg-brand-100 text-brand-700 rounded-md mb-2">상황 판단</span>
+                        <h3 id="quiz-question" class="text-lg sm:text-xl font-bold text-slate-900 leading-snug min-h-[56px]">
+                            문제가 여기에 표시됩니다.
+                        </h3>
+                    </div>
+
+                    <!-- Options Container -->
+                    <div id="quiz-options" class="space-y-3 mb-6">
+                        <!-- Option Buttons generated dynamically -->
+                    </div>
+
+                    <!-- Explanation Box (Initially Hidden) -->
+                    <div id="quiz-explanation-box" class="hidden mb-6 p-4 rounded-2xl border transition-all duration-300">
+                        <div class="flex items-center space-x-2 font-bold mb-1" id="quiz-result-title">
+                            <!-- Correct/Incorrect Icon & Title -->
+                        </div>
+                        <p id="quiz-explanation-text" class="text-xs sm:text-sm leading-relaxed text-slate-700">
+                            해설 내용이 여기에 들어갑니다.
+                        </p>
+                    </div>
+
+                    <!-- Footer Action -->
+                    <div class="flex justify-end pt-2">
+                        <button id="btn-next-quiz" onclick="nextQuizQuestion()" disabled class="px-6 py-3 bg-slate-300 text-slate-500 font-bold rounded-xl transition flex items-center space-x-2 cursor-not-allowed">
+                            <span>다음 문제</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= RESULT SCREEN ================= -->
+            <section id="screen-result" class="hidden transition-all duration-300">
+                <div class="glass-card rounded-3xl p-6 sm:p-10 shadow-2xl border border-slate-700/50 text-center relative overflow-hidden">
+                    <!-- Badge Header -->
+                    <div class="w-20 h-20 mx-auto mb-4 rounded-3xl bg-gradient-to-tr from-brand-500 to-indigo-500 flex items-center justify-center text-white text-3xl shadow-xl shadow-brand-500/40">
+                        <i id="result-icon" class="fa-solid fa-trophy"></i>
+                    </div>
+
+                    <h2 id="result-title" class="text-3xl font-black text-slate-900 mb-1">축하합니다! CPR 마스터 달성!</h2>
+                    <p id="result-subtitle" class="text-slate-500 text-sm mb-6">응급 상황에서 귀중한 생명을 구할 수 있는 준비가 되었습니다.</p>
+
+                    <!-- Score Card Grid -->
+                    <div class="grid grid-cols-2 gap-4 max-w-md mx-auto mb-8">
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                            <span class="text-xs font-bold text-slate-400 block mb-1">퍼즐 시도 횟수</span>
+                            <span id="result-puzzle-score" class="text-2xl font-black text-slate-800">1회</span>
+                        </div>
+                        <div class="p-4 bg-brand-50 rounded-2xl border border-brand-100">
+                            <span class="text-xs font-bold text-brand-600 block mb-1">퀴즈 점수</span>
+                            <span id="result-quiz-score" class="text-2xl font-black text-brand-700">100점</span>
+                            <span id="result-quiz-detail" class="text-xs text-brand-500 block font-medium">(8 / 8 정답)</span>
+                        </div>
+                    </div>
+
+                    <!-- Mastery Certificate / Summary Banner -->
+                    <div class="p-4 rounded-2xl bg-gradient-to-r from-slate-900 to-brand-950 text-white text-left max-w-md mx-auto mb-8 border border-slate-800 shadow-inner">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <i class="fa-solid fa-shield-halved text-brand-400 text-lg"></i>
+                            <h4 class="font-bold text-sm text-brand-200">CPR 마스터 수칙 기억하기</h4>
+                        </div>
+                        <ul class="text-xs space-x-1 text-slate-300 space-y-1 pl-5 list-disc">
+                            <li>깊이 5~6cm, 속도 분당 100~120회 압박</li>
+                            <li>119 신고 시 자동심장충격기(AED) 요청 필수</li>
+                            <li>119 구급대원 도착 직전까지 압박 유지</li>
+                        </ul>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
+                        <button onclick="resetAllGame()" class="w-full py-3.5 bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-700 hover:to-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-brand-500/30 transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-rotate-right"></i>
+                            <span>처음부터 다시 도전하기</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Modal Dialog (Notification Box) -->
+    <div id="custom-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl border border-slate-100 transform transition-all scale-95 opacity-0" id="modal-content">
+            <div id="modal-icon-bg" class="w-14 h-14 rounded-2xl bg-red-100 text-red-500 flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i id="modal-icon" class="fa-solid fa-circle-exclamation"></i>
+            </div>
+            <h3 id="modal-title" class="text-xl font-extrabold text-slate-900 mb-2">알림</h3>
+            <p id="modal-message" class="text-slate-600 text-sm mb-6 leading-relaxed">내용이 들어갑니다.</p>
+            <button onclick="closeModal()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition">
+                확인
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-4 text-center text-xs text-slate-500 border-t border-slate-800 bg-slate-900">
+        <p>© CPR Master Health Education Game - 보건 수업용 교육 프로그램</p>
+    </footer>
+
+    <!-- JS Logic -->
+    <script>
+        /* ==========================================================================
+           DATA DEFINITIONS
+           ========================================================================== */
+
+        // 1. CPR 8 Steps Master Data
+        const cprSteps = [
+            {
+                id: 1,
+                title: "1. 반응 확인",
+                subtitle: "의식 및 반응 체크",
+                emoji: "🗣️",
+                desc: "환자의 양쪽 어깨를 가볍게 두드리며 큰 소리로 '괜찮으세요?'라고 물어 의식과 반응을 확인합니다.",
+                tip: "📌 주의: 척추 손상이 유발될 수 있으므로 환자를 세게 흔들어서는 안 됩니다."
+            },
+            {
+                id: 2,
+                title: "2. 119 신고 및 AED 요청",
+                subtitle: "도움 요청 및 장비 확보",
+                emoji: "🚨",
+                desc: "주변의 특정 사람을 지목하여(예: '빨간 옷 입으신 분!') 119에 신고하게 하고, 다른 사람에게 자동심장충격기(AED)를 가져오도록 요청합니다.",
+                tip: "📌 주의: '누가 119에 신고 좀 해주세요'라고 하면 서로 미룰 수 있으므로 지목이 중요합니다."
+            },
+            {
+                id: 3,
+                title: "3. 호흡 확인",
+                subtitle: "정상 호흡 여부 판별",
+                emoji: "🫁",
+                desc: "환자의 가슴 움직임(얼굴, 가슴)을 10초 이내로 관찰하여 정상적인 호흡이 있는지 확인합니다.",
+                tip: "📌 주의: 심정지 직후의 무작위 헐떡임(임종 호흡)은 정상 호흡이 아닙니다."
+            },
+            {
+                id: 4,
+                title: "4. 가슴 압박 (30회)",
+                subtitle: "강하고 빠르게 압박",
+                emoji: "💓",
+                desc: "가슴 뼈 아래쪽 절반 부위에 깍지 낀 손을 얹고, 체중을 실어 깊이 5~6cm, 분당 100~120회 속도로 30회 압박합니다.",
+                tip: "📌 주의: 팔꿈치를 펴고 환자의 가슴과 수직을 유지해야 체중이 잘 전달됩니다."
+            },
+            {
+                id: 5,
+                title: "5. 기도 개방",
+                subtitle: "머리 젖히고 턱 들기",
+                emoji: "😮",
+                desc: "한 손으로 이마를 뒤로 젖히고, 다른 손가락 2~3개로 아래턱 뼈를 들어 올려 기도를 확보합니다.",
+                tip: "📌 주의: 턱 밑 연한 부위를 세게 누르면 기도가 막힐 수 있으니 뼈 부위를 받쳐줍니다."
+            },
+            {
+                id: 6,
+                title: "6. 인공호흡 (2회)",
+                subtitle: "숨 불어넣기",
+                emoji: "🌬️",
+                desc: "환자의 코를 막고 입을 밀착시킨 후, 가슴이 부풀어 오를 정도로 1초 동안 숨을 2회 불어넣습니다.",
+                tip: "📌 주의: 인공호흡 교육을 받지 않았거나 꺼려진다면 가슴 압박만 지속해도 효과가 있습니다."
+            },
+            {
+                id: 7,
+                title: "7. 가슴 압박 및 인공호흡 반복",
+                subtitle: "30 : 2 교대 수행",
+                emoji: "🔄",
+                desc: "가슴 압박 30회와 인공호흡 2회를 119 구급대원이 도착할 때까지 쉬지 않고 반복합니다.",
+                tip: "📌 주의: 구조자가 2명 이상이면 피로로 인한 질 저하를 막기 위해 2분마다 교대합니다."
+            },
+            {
+                id: 8,
+                title: "8. AED (자동심장충격기) 사용",
+                subtitle: "패드 부착 및 지시 따르기",
+                emoji: "⚡",
+                desc: "AED가 도착하면 전원을 켜고 음성 지시에 따라 패드를 부착한 후 전기 충격 및 심장 rhythm 분석을 수행합니다.",
+                tip: "📌 주의: 심장 rhythm 분석 및 충격 전달 시에는 환자에게서 모두 떨어져야 합니다."
+            }
+        ];
+
+        // 2. Quiz Questions Data (8 Questions)
+        const quizData = [
+            {
+                id: 1,
+                category: "상황 판단",
+                question: "길가에 쓰러진 사람을 발견했을 때 가장 먼저 해야 할 행동은 무엇인가요?",
+                options: [
+                    "즉시 인공호흡을 2회 시행한다.",
+                    "어깨를 가볍게 두드리며 반응 및 의식을 확인한다.",
+                    "즉시 환자를 업고 가까운 병원으로 뛰어간다.",
+                    "물이나 음료수를 마시게 해 의식을 차리게 한다."
+                ],
+                answer: 1, // 0-based index
+                explanation: "쓰러진 환자를 발견하면 가장 먼저 어깨를 가볍게 두드리며 의식이 있는지 반응을 확인해야 합니다. 의식이 없는 환자에게 물을 먹이면 기도가 막힐 수 있어 매우 위험합니다."
+            },
+            {
+                id: 2,
+                category: "신고 요령",
+                question: "지하철역에서 환자가 쓰러졌을 때 주변 사람에게 119 신고를 요청하는 올바른 방법은?",
+                options: [
+                    "\"누구든지 제발 119에 신고 좀 해주세요!\"",
+                    "\"거기 파란색 후드티 입으신 분, 119에 신고해 주시고 AED 좀 가져다주세요!\"",
+                    "\"어떡하지? 다들 핸드폰 꺼내서 119에 전화해 보세요.\"",
+                    "119 신고보다는 직접 택시를 잡는 것이 빠르다."
+                ],
+                answer: 1,
+                explanation: "불특정 다수에게 도움을 요청하면 '방관자 효과'로 인해 아무도 신고하지 않을 수 있습니다. 인상착의를 특정하여 지목해야 책임감을 느끼고 빠르게 행동합니다."
+            },
+            {
+                id: 3,
+                category: "가슴 압박 방법",
+                question: "성인 대상 가슴 압박을 할 때의 올바른 자세와 위치는?",
+                options: [
+                    "가슴 뼈 왼쪽 심장 부위를 손가락 끝으로 누른다.",
+                    "배꼽 부위를 팔꿈치를 굽힌 채 부드럽게 누른다.",
+                    "가슴 뼈 아래쪽 절반 부위에 손꿈치를 대고 팔꿈치를 펴서 수직으로 누른다.",
+                    "목 아래 쇄골 뼈 근처를 빠르게 강타한다."
+                ],
+                answer: 2,
+                explanation: "가슴 뼈 아래쪽 절반 부위에 손깍지를 끼고 손꿈치를 대어 체중을 이용해 가슴과 수직이 되도록 팔을 펴서 압박해야 합니다."
+            },
+            {
+                id: 4,
+                category: "압박 속도 및 깊이",
+                question: "성인 CPR 가슴 압박의 적절한 깊이와 속도로 옳은 것은?",
+                options: [
+                    "깊이 1~2cm, 분당 50회 속도",
+                    "깊이 5~6cm, 분당 100~120회 속도",
+                    "깊이 10cm 이상, 분당 200회 속도",
+                    "깊이에 상관없이 가볍고 천천히"
+                ],
+                answer: 1,
+                explanation: "가슴 압박은 약 5~6cm 깊이(성인 기준)로, 분당 100~120회의 빠르고 강한 속도(1초에 2회 꼴)로 유지해야 심장 마사지 효과가 발생합니다."
+            },
+            {
+                id: 5,
+                category: "압박과 인공호흡 비율",
+                question: "심폐소생술 시 가슴 압박과 인공호흡의 권장 횟수 비율은 얼마인가요?",
+                options: [
+                    "가슴 압박 15회 : 인공호흡 5회",
+                    "가슴 압박 30회 : 인공호흡 2회",
+                    "가슴 압박 50회 : 인공호흡 1회",
+                    "가슴 압박 10회 : 인공호흡 10회"
+                ],
+                answer: 1,
+                explanation: "표준 심폐소생술 비율은 가슴 압박 30회 후 인공호흡 2회입니다. (30:2 반복)"
+            },
+            {
+                id: 6,
+                category: "AED 사용법",
+                question: "AED(자동심장충격기)가 심장 rhythm 분석을 시작하거나 전기 충격을 가할 때 주의할 점은?",
+                options: [
+                    "환자가 움직이지 못하게 온몸을 꽉 잡고 있는다.",
+                    "환자에게서 모든 사람이 손을 떼고 떨어진다.",
+                    "환자의 입에 인공호흡을 계속 시행한다.",
+                    "AED 기계를 세게 흔들어 준다."
+                ],
+                answer: 1,
+                explanation: "분석 및 충격 시 환자에게 접촉해 있으면 정확한 심전도 분석이 불가능하고, 구조자에게 전기 충격이 전달되어 감전 사고가 일어날 수 있으므로 \"모두 떨어지세요!\"라고 외치고 손을 떼어야 합니다."
+            },
+            {
+                id: 7,
+                category: "골든타임",
+                question: "심정지 환자 발생 시 뇌 손상을 최소화할 수 있는 생명의 골든타임은 몇 분인가요?",
+                options: [
+                    "약 4분 이내",
+                    "약 15분 이내",
+                    "약 30분 이내",
+                    "약 1시간 이내"
+                ],
+                answer: 0,
+                explanation: "심장이 정지한 후 4분이 지나면 뇌에 산소 공급이 중단되어 뇌 손상이 시작됩니다. 따라서 4분 이내에 심폐소생술이 시작되어야 합니다."
+            },
+            {
+                id: 8,
+                category: "실전 응급 처치",
+                question: "인공호흡 방법을 모르거나, 감염 우려 등으로 인공호흡을 하기 망설여지는 상황일 때 올바른 대처법은?",
+                options: [
+                    "CPR을 포기하고 구급차만 기다린다.",
+                    "인공호흡을 할 수 없어도 지속적으로 '가슴 압박 전용 심폐소생술'을 시행한다.",
+                    "환자의 뺨을 때려 의식을 깨운다.",
+                    "환자를 옆으로 돌려 눕혀만 놓는다."
+                ],
+                answer: 1,
+                explanation: "인공호흡을 꺼리거나 방법을 모르는 경우, 아무것도 하지 않는 것보다 가슴 압박만 지속해서 제공하는 '가슴 압박 소생술'을 하는 것이 환자의 생존율을 획기적으로 높입니다."
+            }
+        ];
+
+        /* ==========================================================================
+           GAME STATE MANAGEMENT
+           ========================================================================== */
+        let currentStep = 0; // 0: Start, 1: Step1, 2: Step2, 3: Step3, 4: Result
+        
+        // Step 1 State
+        let currentCardIndex = 0;
+        let isCardFlipped = false;
+
+        // Step 2 State
+        let currentPuzzleOrder = []; // Array of step objects currently arranged
+        let puzzleAttempts = 0;
+
+        // Step 3 State
+        let currentQuizIndex = 0;
+        let quizScore = 0;
+        let userQuizAnswers = [];
+        let isQuizAnswered = false;
+
+        /* ==========================================================================
+           CORE NAVIGATION & INITIALIZATION
+           ========================================================================== */
+        window.onload = function() {
+            initStep1();
+            initPuzzle();
+            updateStepNavUI(0);
+        };
+
+        function goToStep(stepNum) {
+            currentStep = stepNum;
+            
+            // Hide all screens
+            document.getElementById('screen-start').classList.add('hidden');
+            document.getElementById('screen-step1').classList.add('hidden');
+            document.getElementById('screen-step2').classList.add('hidden');
+            document.getElementById('screen-step3').classList.add('hidden');
+            document.getElementById('screen-result').classList.add('hidden');
+
+            // Show selected screen
+            if (stepNum === 0) document.getElementById('screen-start').classList.remove('hidden');
+            else if (stepNum === 1) {
+                document.getElementById('screen-step1').classList.remove('hidden');
+                renderCard();
+            }
+            else if (stepNum === 2) {
+                document.getElementById('screen-step2').classList.remove('hidden');
+            }
+            else if (stepNum === 3) {
+                document.getElementById('screen-step3').classList.remove('hidden');
+                startQuiz();
+            }
+            else if (stepNum === 4) {
+                document.getElementById('screen-result').classList.remove('hidden');
+                renderResultScreen();
+            }
+
+            updateStepNavUI(stepNum);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateStepNavUI(stepNum) {
+            for (let i = 1; i <= 3; i++) {
+                const pill = document.getElementById(`step-pill-${i}`);
+                if (i === stepNum) {
+                    pill.className = "px-3 py-1.5 rounded-full transition-all flex items-center space-x-1 bg-brand-600 text-white shadow-md shadow-brand-600/30 font-bold";
+                } else if (i < stepNum) {
+                    pill.className = "px-3 py-1.5 rounded-full transition-all flex items-center space-x-1 bg-brand-100 text-brand-700 font-medium";
+                } else {
+                    pill.className = "px-3 py-1.5 rounded-full transition-all flex items-center space-x-1 bg-slate-800 text-slate-400 font-normal";
+                }
+            }
+        }
+
+        /* ==========================================================================
+           STEP 1 LOGIC (FLASHCARDS & VIEW SWITCH)
+           ========================================================================== */
+        function initStep1() {
+            renderCardDots();
+            renderAllCardsGrid();
+        }
+
+        function renderCard() {
+            const data = cprSteps[currentCardIndex];
+            
+            // Reset Flip State
+            const cardInner = document.getElementById('flashcard-inner');
+            cardInner.classList.remove('rotate-y-180');
+            isCardFlipped = false;
+
+            setTimeout(() => {
+                document.getElementById('card-badge').innerText = `${data.id}단계 / 8단계`;
+                document.getElementById('card-emoji').innerText = data.emoji;
+                document.getElementById('card-title').innerText = data.title.replace(/^\d+\.\s*/, '');
+                document.getElementById('card-subtitle').innerText = data.subtitle;
+                
+                document.getElementById('card-back-title').innerText = `${data.id}. ${data.title.replace(/^\d+\.\s*/, '')}`;
+                document.getElementById('card-desc').innerText = data.desc;
+                document.getElementById('card-tip').innerText = data.tip;
+                
+                updateCardDots();
+            }, 150);
+        }
+
+        function flipCard() {
+            const cardInner = document.getElementById('flashcard-inner');
+            isCardFlipped = !isCardFlipped;
+            if (isCardFlipped) {
+                cardInner.classList.add('rotate-y-180');
+            } else {
+                cardInner.classList.remove('rotate-y-180');
+            }
+        }
+
+        function nextCard() {
+            if (currentCardIndex < cprSteps.length - 1) {
+                currentCardIndex++;
+            } else {
+                currentCardIndex = 0; // Loop around
+            }
+            renderCard();
+        }
+
+        function prevCard() {
+            if (currentCardIndex > 0) {
+                currentCardIndex--;
+            } else {
+                currentCardIndex = cprSteps.length - 1;
+            }
+            renderCard();
+        }
+
+        function renderCardDots() {
+            const container = document.getElementById('card-dots');
+            container.innerHTML = '';
+            cprSteps.forEach((_, idx) => {
+                const dot = document.createElement('button');
+                dot.className = `w-2.5 h-2.5 rounded-full transition-all ${idx === currentCardIndex ? 'bg-brand-600 w-6' : 'bg-slate-300'}`;
+                dot.onclick = () => {
+                    currentCardIndex = idx;
+                    renderCard();
+                };
+                container.appendChild(dot);
+            });
+        }
+
+        function updateCardDots() {
+            const dots = document.getElementById('card-dots').children;
+            for (let i = 0; i < dots.length; i++) {
+                if (i === currentCardIndex) {
+                    dots[i].className = "w-6 h-2.5 bg-brand-600 rounded-full transition-all";
+                } else {
+                    dots[i].className = "w-2.5 h-2.5 bg-slate-300 rounded-full transition-all";
+                }
+            }
+        }
+
+        function toggleStep1View(mode) {
+            const singleView = document.getElementById('step1-single-view');
+            const allView = document.getElementById('step1-all-view');
+            const btnSingle = document.getElementById('view-mode-single');
+            const btnAll = document.getElementById('view-mode-all');
+
+            if (mode === 'single') {
+                singleView.classList.remove('hidden');
+                allView.classList.add('hidden');
+                btnSingle.className = "px-3 py-1.5 rounded-lg bg-white shadow text-brand-600 font-bold";
+                btnAll.className = "px-3 py-1.5 rounded-lg hover:text-slate-900 font-medium";
+            } else {
+                singleView.classList.add('hidden');
+                allView.classList.remove('hidden');
+                btnAll.className = "px-3 py-1.5 rounded-lg bg-white shadow text-brand-600 font-bold";
+                btnSingle.className = "px-3 py-1.5 rounded-lg hover:text-slate-900 font-medium";
+            }
+        }
+
+        function renderAllCardsGrid() {
+            const container = document.getElementById('step1-all-view');
+            container.innerHTML = '';
+            cprSteps.forEach(step => {
+                const cardHtml = `
+                    <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm hover:border-brand-300 transition flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xl">${step.emoji}</span>
+                                <span class="text-xs font-bold px-2 py-0.5 bg-brand-100 text-brand-700 rounded-full">${step.id}단계</span>
+                            </div>
+                            <h4 class="font-bold text-slate-900 text-sm mb-1">${step.title}</h4>
+                            <p class="text-xs text-slate-500 line-clamp-3">${step.desc}</p>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
+        }
+
+
+        /* ==========================================================================
+           STEP 2 LOGIC (DRAG AND DROP PUZZLE)
+           ========================================================================== */
+        function initPuzzle() {
+            puzzleAttempts = 0;
+            document.getElementById('puzzle-attempts').innerText = "0회";
+            shufflePuzzle();
+        }
+
+        function shufflePuzzle() {
+            // Fisher-Yates Shuffle
+            currentPuzzleOrder = [...cprSteps];
+            for (let i = currentPuzzleOrder.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [currentPuzzleOrder[i], currentPuzzleOrder[j]] = [currentPuzzleOrder[j], currentPuzzleOrder[i]];
+            }
+            renderPuzzleList();
+        }
+
+        function renderPuzzleList() {
+            const container = document.getElementById('puzzle-list');
+            container.innerHTML = '';
+
+            currentPuzzleOrder.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = "draggable-item bg-white border-2 border-slate-200 rounded-2xl p-3.5 flex items-center justify-between shadow-sm hover:border-brand-300 transition cursor-grab active:cursor-grabbing";
+                div.draggable = true;
+                div.dataset.index = index;
+
+                div.innerHTML = `
+                    <div class="flex items-center space-x-3 pointer-events-none">
+                        <span class="w-8 h-8 rounded-xl bg-slate-100 text-slate-600 font-bold text-xs flex items-center justify-center">${index + 1}</span>
+                        <span class="text-2xl">${item.emoji}</span>
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-sm sm:text-base">${item.title.replace(/^\d+\.\s*/, '')}</h4>
+                            <p class="text-xs text-slate-400 hidden sm:block">${item.subtitle}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 text-slate-400">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </div>
+                `;
+
+                // Add Drag & Touch Event Listeners
+                addDragAndDropEvents(div);
+                container.appendChild(div);
+            });
+        }
+
+        let dragSrcIndex = null;
+
+        function addDragAndDropEvents(elem) {
+            elem.addEventListener('dragstart', (e) => {
+                dragSrcIndex = parseInt(elem.dataset.index);
+                elem.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+            });
+
+            elem.addEventListener('dragend', () => {
+                elem.classList.remove('dragging');
+            });
+
+            elem.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+            });
+
+            elem.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const targetIndex = parseInt(elem.dataset.index);
+                if (dragSrcIndex !== null && dragSrcIndex !== targetIndex) {
+                    // Swap elements in currentPuzzleOrder
+                    const movedItem = currentPuzzleOrder.splice(dragSrcIndex, 1)[0];
+                    currentPuzzleOrder.splice(targetIndex, 0, movedItem);
+                    renderPuzzleList();
+                }
+            });
+
+            // Touch Support for Mobile Drag & Drop
+            let touchStartY = 0;
+            let initialIndex = 0;
+
+            elem.addEventListener('touchstart', (e) => {
+                touchStartY = e.touches[0].clientY;
+                initialIndex = parseInt(elem.dataset.index);
+                elem.classList.add('bg-brand-50');
+            }, { passive: true });
+
+            elem.addEventListener('touchend', (e) => {
+                elem.classList.remove('bg-brand-50');
+                const touchEndY = e.changedTouches[0].clientY;
+                const diffY = touchEndY - touchStartY;
+
+                // Threshold for move up/down
+                if (Math.abs(diffY) > 30) {
+                    const targetOffset = Math.round(diffY / 60);
+                    let targetIndex = initialIndex + targetOffset;
+                    if (targetIndex < 0) targetIndex = 0;
+                    if (targetIndex >= currentPuzzleOrder.length) targetIndex = currentPuzzleOrder.length - 1;
+
+                    if (targetIndex !== initialIndex) {
+                        const movedItem = currentPuzzleOrder.splice(initialIndex, 1)[0];
+                        currentPuzzleOrder.splice(targetIndex, 0, movedItem);
+                        renderPuzzleList();
+                    }
+                }
+            }, { passive: true });
+        }
+
+        function checkPuzzleAnswer() {
+            puzzleAttempts++;
+            document.getElementById('puzzle-attempts').innerText = `${puzzleAttempts}회`;
+
+            // Check if user order matches cprSteps ID sequence
+            let isCorrect = true;
+            for (let i = 0; i < currentPuzzleOrder.length; i++) {
+                if (currentPuzzleOrder[i].id !== cprSteps[i].id) {
+                    isCorrect = false;
+                    break;
+                }
+            }
+
+            if (isCorrect) {
+                showModal("🎉 퍼즐 완료!", "정확한 CPR 순서를 마스터하셨습니다! 이제 실전 검증 퀴즈 단계로 이동합니다.", "success", () => {
+                    goToStep(3);
+                });
+            } else {
+                showModal("❌ 다시 한번 확인해보세요", "순서가 올바르지 않은 단계가 있습니다. 1단계의 카드를 떠올리며 다시 배치를 조정해 보세요!", "error");
+            }
+        }
+
+
+        /* ==========================================================================
+           STEP 3 LOGIC (MULTIPLE CHOICE QUIZ)
+           ========================================================================== */
+        function startQuiz() {
+            currentQuizIndex = 0;
+            quizScore = 0;
+            userQuizAnswers = [];
+            renderQuizQuestion();
+        }
+
+        function renderQuizQuestion() {
+            isQuizAnswered = false;
+            const q = quizData[currentQuizIndex];
+
+            // Progress Update
+            document.getElementById('quiz-progress-text').innerText = `문제 ${currentQuizIndex + 1} / ${quizData.length}`;
+            document.getElementById('quiz-progress-bar').style.width = `${((currentQuizIndex + 1) / quizData.length) * 100}%`;
+
+            // Question Details
+            document.getElementById('quiz-category').innerText = q.category;
+            document.getElementById('quiz-question').innerText = `${currentQuizIndex + 1}. ${q.question}`;
+
+            // Reset Options & Explanation Box
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+
+            const explanationBox = document.getElementById('quiz-explanation-box');
+            explanationBox.classList.add('hidden');
+
+            const nextBtn = document.getElementById('btn-next-quiz');
+            nextBtn.disabled = true;
+            nextBtn.className = "px-6 py-3 bg-slate-300 text-slate-500 font-bold rounded-xl transition flex items-center space-x-2 cursor-not-allowed";
+
+            // Render Options
+            q.options.forEach((optText, optIdx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-2xl border-2 border-slate-200 hover:border-brand-400 bg-white hover:bg-brand-50/50 transition font-medium text-slate-800 text-sm sm:text-base flex items-start space-x-3";
+                btn.onclick = () => selectQuizOption(optIdx);
+
+                btn.innerHTML = `
+                    <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">${optIdx + 1}</span>
+                    <span class="flex-grow">${optText}</span>
+                `;
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectQuizOption(selectedIdx) {
+            if (isQuizAnswered) return;
+            isQuizAnswered = true;
+
+            const q = quizData[currentQuizIndex];
+            const isCorrect = (selectedIdx === q.answer);
+            if (isCorrect) quizScore++;
+
+            userQuizAnswers.push({ questionId: q.id, selected: selectedIdx, isCorrect: isCorrect });
+
+            // Highlight Options
+            const optionsContainer = document.getElementById('quiz-options');
+            const buttons = optionsContainer.children;
+
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = true;
+                buttons[i].classList.remove('hover:border-brand-400', 'hover:bg-brand-50/50');
+                
+                if (i === q.answer) {
+                    buttons[i].className = "w-full text-left p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 font-bold text-sm sm:text-base flex items-start space-x-3";
+                } else if (i === selectedIdx && !isCorrect) {
+                    buttons[i].className = "w-full text-left p-4 rounded-2xl border-2 border-rose-400 bg-rose-50 text-rose-900 font-medium text-sm sm:text-base flex items-start space-x-3";
+                } else {
+                    buttons[i].className = "w-full text-left p-4 rounded-2xl border border-slate-200 bg-slate-50 text-slate-400 text-sm sm:text-base flex items-start space-x-3 opacity-60";
+                }
+            }
+
+            // Show Explanation
+            const expBox = document.getElementById('quiz-explanation-box');
+            const expTitle = document.getElementById('quiz-result-title');
+            const expText = document.getElementById('quiz-explanation-text');
+
+            expBox.classList.remove('hidden');
+            if (isCorrect) {
+                expBox.className = "mb-6 p-4 rounded-2xl border bg-emerald-50 border-emerald-200 text-emerald-900";
+                expTitle.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 text-lg"></i><span class="text-emerald-700">정답입니다!</span>`;
+            } else {
+                expBox.className = "mb-6 p-4 rounded-2xl border bg-rose-50 border-rose-200 text-rose-900";
+                expTitle.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600 text-lg"></i><span class="text-rose-700">오답입니다</span>`;
+            }
+            expText.innerText = q.explanation;
+
+            // Enable Next Button
+            const nextBtn = document.getElementById('btn-next-quiz');
+            nextBtn.disabled = false;
+            nextBtn.className = "px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl shadow-lg shadow-brand-500/30 transition flex items-center space-x-2 cursor-pointer";
+            
+            if (currentQuizIndex === quizData.length - 1) {
+                nextBtn.querySelector('span').innerText = "결과 확인하기";
+            }
+        }
+
+        function nextQuizQuestion() {
+            if (!isQuizAnswered) return;
+
+            if (currentQuizIndex < quizData.length - 1) {
+                currentQuizIndex++;
+                renderQuizQuestion();
+            } else {
+                goToStep(4); // Show Results
+            }
+        }
+
+
+        /* ==========================================================================
+           RESULT SCREEN & RESTART LOGIC
+           ========================================================================== */
+        function renderResultScreen() {
+            const quizScorePct = Math.round((quizScore / quizData.length) * 100);
+            
+            document.getElementById('result-puzzle-score').innerText = `${puzzleAttempts}회 시도`;
+            document.getElementById('result-quiz-score').innerText = `${quizScorePct}점`;
+            document.getElementById('result-quiz-detail').innerText = `(${quizScore} / ${quizData.length} 정답)`;
+
+            const titleElem = document.getElementById('result-title');
+            const subtitleElem = document.getElementById('result-subtitle');
+            const iconElem = document.getElementById('result-icon');
+
+            if (quizScorePct === 100) {
+                titleElem.innerText = "🎉 완벽합니다! CPR 완벽 마스터!";
+                subtitleElem.innerText = "모든 퀴즈와 퍼즐을 완벽히 해결하셨습니다. 응급 시 소중한 생명을 구할 능력을 갖추셨습니다!";
+                iconElem.className = "fa-solid fa-award";
+            } else if (quizScorePct >= 70) {
+                titleElem.innerText = "👏 훌륭해요! 보건 우수 수강생";
+                subtitleElem.innerText = "대부분의 CPR 수칙을 잘 이해하셨네요! 틀린 문제를 복습하면 perfect 마스터가 될 수 있습니다.";
+                iconElem.className = "fa-solid fa-trophy";
+            } else {
+                titleElem.innerText = "💪 조금 더 복습해볼까요?";
+                subtitleElem.innerText = "CPR은 정확한 순서와 지식이 생명입니다! 다시 한 번 학습 카드를 살펴보고 재도전해 보세요.";
+                iconElem.className = "fa-solid fa-heart-pulse";
+            }
+        }
+
+        function resetAllGame() {
+            currentStep = 0;
+            currentCardIndex = 0;
+            puzzleAttempts = 0;
+            currentQuizIndex = 0;
+            quizScore = 0;
+            
+            initStep1();
+            initPuzzle();
+            goToStep(0);
+        }
+
+
+        /* ==========================================================================
+           MODAL DIALOG SYSTEM
+           ========================================================================== */
+        let modalCallback = null;
+
+        function showModal(title, message, type = 'info', callback = null) {
+            modalCallback = callback;
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+
+            const modalIconBg = document.getElementById('modal-icon-bg');
+            const modalIcon = document.getElementById('modal-icon');
+
+            if (type === 'success') {
+                modalIconBg.className = "w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4 text-2xl";
+                modalIcon.className = "fa-solid fa-circle-check";
+            } else if (type === 'error') {
+                modalIconBg.className = "w-14 h-14 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-4 text-2xl";
+                modalIcon.className = "fa-solid fa-triangle-exclamation";
+            } else {
+                modalIconBg.className = "w-14 h-14 rounded-2xl bg-brand-100 text-brand-600 flex items-center justify-center mx-auto mb-4 text-2xl";
+                modalIcon.className = "fa-solid fa-circle-info";
+            }
+
+            const modal = document.getElementById('custom-modal');
+            const content = document.getElementById('modal-content');
+            modal.classList.remove('hidden');
+
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeModal() {
+            const content = document.getElementById('modal-content');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+
+            setTimeout(() => {
+                document.getElementById('custom-modal').classList.add('hidden');
+                if (modalCallback) {
+                    modalCallback();
+                    modalCallback = null;
+                }
+            }, 200);
+        }
+    </script>
+</body>
+</html>
